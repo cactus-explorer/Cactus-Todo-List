@@ -2,10 +2,16 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.template import loader, Context
 from django.shortcuts import render
-import datetime
+from django.shortcuts import redirect
+
 
 from .models import Task
 from .forms import NameForm
+
+
+from datetime import *
+from django.utils import timezone
+
 
 
 def index(request):
@@ -17,13 +23,13 @@ def index(request):
 
         if task_id != None:
             Task.objects.filter(pk=task_id).delete()
-            return HttpResponseRedirect('')
+            return redirect('/')
         elif edited != None:
             t = Task.objects.get(id=edited)
             t.task_text = newText  # change field
             t.save() # this will update only
             print(newText)
-            return HttpResponseRedirect('')
+            return redirect('/')
         else:
         # check whether it's valid:
             if form.is_valid():
@@ -33,10 +39,10 @@ def index(request):
                 print(form.cleaned_data['your_name'])
 
                 saveTask = Task(task_text=form.cleaned_data['your_name'], 
-                                pub_date=datetime.datetime.utcnow())
+                                pub_date=timezone.now())
                 saveTask.save()
                 
-                return HttpResponseRedirect('')
+                return redirect('/')
             else:
                 return HttpResponse('Invalid')
     else:
